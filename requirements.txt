@@ -5,4 +5,5 @@ psycopg2-binary>=2.9.0
 redis>=4.5.0
 gunicorn>=21.2.0
 gevent>=22.10.0
+eventlet
 gevent-websocket>=0.10.1
