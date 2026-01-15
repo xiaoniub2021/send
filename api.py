@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # region API
+
 from gevent import monkey
 monkey.patch_all()
+import eventlet
+eventlet.monkey_patch()
 # region [IMPORTS]
 import os
 import json
