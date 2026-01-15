@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # region API
 
-from gevent import monkey
-monkey.patch_all()
+
 import eventlet
 eventlet.monkey_patch()
 # region [IMPORTS]
@@ -25,8 +24,7 @@ from flask_sock import Sock
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from urllib.parse import urlparse
-from gevent import spawn, joinall
-from gevent.timeout import Timeout
+
 # endregion
 
 # region [APP INIT]
@@ -113,7 +111,7 @@ def _trace(event: str, **fields):
     if not _TRACE_LOG_ENABLED:
         return
     try:
-        # 比 inspect.stack() 轻量很多，避免大量追踪时拖垮 gevent
+   
         f = sys._getframe(1)
         loc = f"{Path(f.f_code.co_filename).name}:{f.f_lineno}:{f.f_code.co_name}"
         payload = json.dumps(fields, ensure_ascii=False, default=str)
@@ -3748,11 +3746,11 @@ def create_task():
             conn_reclaim.close()
         except Exception as e:
             logger.warning(f"{LOCATION} 后台回收超时分片失败: {e}")
-    # 使用 gevent 运行后台任务，避免跨线程调用 WebSocket/锁导致的随机丢包与卡死
+   
     try:
         spawn(async_reclaim)
     except Exception:
-        # 兜底：如果 gevent 不可用，再退回线程
+       
         import threading
         threading.Thread(target=async_reclaim, daemon=True).start()
 
@@ -3822,7 +3820,7 @@ def create_task():
             import traceback
             traceback.print_exc()
             _trace("task.create.background_fail", trace_id=trace_id, task_id=task_id, error=str(e))
-    # 使用 gevent 运行后台任务，避免跨线程对 worker ws.send 造成不稳定
+   
     try:
         spawn(async_create_shards_and_assign)
     except Exception:
@@ -5549,44 +5547,8 @@ def get_logs():
 
 # region [MAIN]
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 28080))
-    
-    from gevent import pywsgi
-    
-    import sys
-    
-    class FilteredLog:
 
-        def __init__(self, original_log):
-            self.original_log = original_log
-        
-        def write(self, message):
-            # 过滤掉不需要的日志
-            if '/api/id-library' in message:
-                return
-            # 过滤掉日志保存接口的访问日志，避免刷屏
-            if '/api/admin/logs/save' in message:
-                return
-            if self.original_log:
-                self.original_log.write(message)
-            else:
-                sys.stderr.write(message)
-        
-        def flush(self):
-            if self.original_log:
-                self.original_log.flush()
-            else:
-                sys.stderr.flush()
-    
-    filtered_log = FilteredLog(None)
-    server = pywsgi.WSGIServer(('0.0.0.0', port), app, log=filtered_log)
-    print("")
-    print(f"API Server Starting on port {port} ")
-    print("Waiting for Connect...")
-    print("")
-    print("===============================================")
-    server.serve_forever()
+
 # endregion
 
 # endregion
