@@ -7,4 +7,6 @@ gunicorn>=21.2.0
 gevent>=22.10.0
 eventlet>=0.36.1
 gevent-websocket>=0.10.1
+greenlet
+
 
