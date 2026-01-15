@@ -191,6 +191,10 @@ def _init_db_pool():
                 "password": os.environ.get("DB_PASSWORD", "autosender123")
             }
             database_url = f"postgresql://{default_db_config['user']}:{default_db_config['password']}@{default_db_config['host']}:{default_db_config['port']}/{default_db_config['database']}"
+        else:
+            # 兼容某些平台提供的 postgres:// URL（libpq/psycopg2 在部分环境可能不接受）
+            if database_url.startswith("postgres://"):
+                database_url = "postgresql://" + database_url[len("postgres://"):]
         
         try:
             # Create a thread-safe connection pool
@@ -5020,7 +5024,7 @@ def worker_websocket(ws):
             with _worker_lock:
                 _worker_clients.pop(server_id, None)
             
-            redis_manager.worker_offline(server_id)
+            redis_manager.remove_worker(server_id)
             
             # 🔥 更新数据库状态为 disconnected
             try:
