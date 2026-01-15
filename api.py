@@ -5023,9 +5023,9 @@ def worker_websocket(ws):
         if server_id:
             with _worker_lock:
                 _worker_clients.pop(server_id, None)
-            
+            logger.info(f"即将移除 worker: {server_id}")
             redis_manager.remove_worker(server_id)
-            
+            logger.info(f"移除 worker 完成: {server_id}")
             # 🔥 更新数据库状态为 disconnected
             try:
                 conn = db()
