@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 # region API
 
-
+# region [IMPORTS]
 import eventlet
 eventlet.monkey_patch()
-# region [IMPORTS]
 import os
 import json
 import time
@@ -111,7 +110,7 @@ def _trace(event: str, **fields):
     if not _TRACE_LOG_ENABLED:
         return
     try:
-   
+
         f = sys._getframe(1)
         loc = f"{Path(f.f_code.co_filename).name}:{f.f_lineno}:{f.f_code.co_name}"
         payload = json.dumps(fields, ensure_ascii=False, default=str)
@@ -3746,11 +3745,11 @@ def create_task():
             conn_reclaim.close()
         except Exception as e:
             logger.warning(f"{LOCATION} 后台回收超时分片失败: {e}")
-   
+
     try:
         spawn(async_reclaim)
     except Exception:
-       
+
         import threading
         threading.Thread(target=async_reclaim, daemon=True).start()
 
@@ -3820,7 +3819,7 @@ def create_task():
             import traceback
             traceback.print_exc()
             _trace("task.create.background_fail", trace_id=trace_id, task_id=task_id, error=str(e))
-   
+ 
     try:
         spawn(async_create_shards_and_assign)
     except Exception:
@@ -5024,9 +5023,9 @@ def worker_websocket(ws):
         if server_id:
             with _worker_lock:
                 _worker_clients.pop(server_id, None)
-            logger.info(f"即将移除 worker: {server_id}")
+            
             redis_manager.remove_worker(server_id)
-            logger.info(f"移除 worker 完成: {server_id}")
+            
             # 🔥 更新数据库状态为 disconnected
             try:
                 conn = db()
@@ -5546,8 +5545,6 @@ def get_logs():
 # endregion
 
 # region [MAIN]
-
-
 
 # endregion
 
