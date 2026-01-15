@@ -1,1 +1,1 @@
-web: gunicorn api:app -c gunicorn_config.py
+gunicorn api:app -c gunicorn_config.py
